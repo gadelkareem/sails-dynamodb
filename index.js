@@ -563,6 +563,14 @@ module.exports = (function () {
           scanning = true;
           query = model.scan();
         }
+		
+		if (!_.isEmpty(options.select)) {
+            if (_.isString(options.select)) {
+                query = query.attributes([options.select]);
+            } else {
+                query = query.attributes(options.select);
+            }
+        }
 
         var queryOp = scanning ? 'where' : 'filter';
         
