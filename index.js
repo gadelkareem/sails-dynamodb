@@ -818,6 +818,14 @@ module.exports = (function () {
         
         query.loadAll();
       }
+	  
+  	  if ('select' in options) {
+        if(_.isString(options.select)) {
+            query = query.attributes([options.select]);
+        } else {
+            query = query.attributes(options.select);
+         }
+      }
       
       return query;
     },
