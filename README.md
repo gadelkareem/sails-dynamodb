@@ -126,6 +126,17 @@ HighScore: {
 }
 ```
 
+### Sorting By Indexes
+Sorting does not look like how it looks with the normal sails database adapters. You can not sort by an arbitrary field, you must sort by a range field in an index. The index is automatically inferred by what you are querying and you can specify a direction to sort the range fields of the used index. Using the GSI defined above, this will query for descending highscores of Super Mario World:
+```
+GameScores.find({
+  where: {
+    GameTitle: "Super Mario World"
+  },
+  sort: "-1"
+})
+```
+
 ## Update
 The `Model.update` method is currently expected to update exactly one item since DynamoDB only offers an [UpdateItem](http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html) endpoint.  A complete primary key must be supplied.  Any additional "where" conditions passed to `Model.update` are used to build a conditional expression for the update.  Despite the fact the DynamoDB updates only one item, `Model.update` will always return an array of the (one or zero) updated items upon success.
 
