@@ -879,12 +879,15 @@ module.exports = (function () {
       if ('sort' in options) {
         
         //according to http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html#DDB-Query-request-ScanIndexForward
-        var sort = _.keys(options.sort)[0];
+        var sortIndex = _.keys(options.sort)[0];
+        var sortDirection = options.sort[sortIndex];
         
-        if (sort == 1) {
+        query.usingIndex(sortIndex);
+        
+        if (sortDirection == 1) {
           query.ascending();
         }
-        else if (sort == -1) {
+        else if (sortDirection == -1) {
           query.descending();
         }
       }
