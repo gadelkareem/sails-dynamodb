@@ -525,7 +525,8 @@ module.exports = (function () {
       // options.skip
       // options.
 
-      // Filter, paginate, and sort records from the datastore.
+      // Filter, paginate, and 
+      records from the datastore.
       // You should end up w/ an array of objects as a result.
       // If no matches were found, this will be an empty array.
 
@@ -882,7 +883,9 @@ module.exports = (function () {
         var sortIndex = _.keys(options.sort)[0];
         var sortDirection = options.sort[sortIndex];
         
-        query.usingIndex(sortIndex);
+        if (sortIndex){
+          query.usingIndex(sortIndex);
+        }
         
         if (sortDirection == 1) {
           query.ascending();
