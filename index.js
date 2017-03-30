@@ -758,6 +758,11 @@ module.exports = (function () {
       var indexInfo;
       var indexName;
       var indexType;
+
+      if (!(_.isArray(fields))){
+        fields = Object.keys(fields);
+      }
+
       for (var i = 0; i < fields.length; i++) {
 
         fieldName = fields[i];

@@ -1,6 +1,6 @@
 {
   "name": "sails-dynamodb",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Amazon DynamoDB adapter for Sails / Waterline",
   "main": "index.js",
   "scripts": {
