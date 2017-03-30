@@ -67,11 +67,14 @@ Support for where is added as following:
   ?where={"name":{"contains":"firstName lastName"}}
   ?where={"name":{"beginsWith":"firstName"}}
   ?where={"name":{"in":["firstName lastName", "another name"]}}
-  ?where={"name":{"between":["firstName, "lastName""]}}
+  ?where={"name":{"between":["firstName, "lastName"]}}
 ```
 
 ### Pagination
-Support for Pagination is added as following:
+__NOTE__: `skip` is not supported!
+
+Support for Pagination is done using DynamoDB's `LastEvaluatedKey` and passing that to `ExclusiveStartKey`.
+See: [DynamoDB Documentation](http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html)
 
 1. First add a limit to current request
 
@@ -84,6 +87,35 @@ Support for Pagination is added as following:
 ```
 /user?limit=2&startKey={"PrimaryKey": "2"}
 ```
+
+For more complex queries, you must provide all the fields that are used for an index of the last object returned. An example not using the blueprint apis below. Assume there is a GSI on email (hash) and loginDate (range).
+
+```
+// Looking for recent logins by a specific email address
+UserLogins.find({
+  where: {
+    email: 'someone@like.you'
+    loginDate: {"lt": new Date().toISOString()}
+  },
+  limit: 10
+}).exec((err, userLogins) => {
+  UserLogins.find({
+    where: {
+      email: 'someone@like.you'
+      loginDate: {"lt": new Date().toISOString()},
+      startKey: {
+        email: 'someone@like.you',
+        loginDate: userLogins[userLogins.length - 1].loginDate
+      }
+    },
+    limit: 10
+  }).exec((err, moreUserLogins) => {
+    doSomethingWithLogins(userLogins.concat(moreUserLogins));
+  });
+});
+```
+
+See that the startKey is in the `where` block and that it has both fields of the Global Secondary Index.
 
 ## Using DynamoDB Indexes
 Primary hash/range keys, local secondary indexes, and global secondary indexes are currently supported by this adapter, but their usage is always inferred from query conditions–`Model.find` will attempt to use the most optimal index using the following precedence:
@@ -123,6 +155,26 @@ GameTitle: {
 HighScore: {
   type: 'integer',
   index: 'GameTitleIndex-range'
+}
+```
+
+#### Fields with multiple indexes
+A field can be both the primary and part of a GSI index. Participating in multiple GSI indexes is not currently supported.
+
+```
+GameTitle: {
+  type: 'string',
+  primaryKey: 'hash'
+  index: 'GameTitleIndex-hash'
+}
+```
+
+__Not Supported Yet__:
+```
+GameTitle: {
+  type: 'string',
+  primaryKey: 'hash'
+  index: ['GameTitleIndex-hash'. 'SomeOtherIndex-hash']
 }
 ```
 
