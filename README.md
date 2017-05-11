@@ -159,7 +159,7 @@ HighScore: {
 ```
 
 #### Fields with multiple indexes
-A field can be both the primary and part of a GSI index. Participating in multiple GSI indexes is not currently supported.
+A field can be both the primary and part of a GSI index. Participating in multiple GSI indexes is supported as of v0.12.5.
 
 ```
 GameTitle: {
@@ -169,12 +169,21 @@ GameTitle: {
 }
 ```
 
-__Not Supported Yet__:
+Multiple GSIs:
 ```
 GameTitle: {
   type: 'string',
   primaryKey: 'hash'
   index: ['GameTitleIndex-hash'. 'SomeOtherIndex-hash']
+}
+```
+
+Multiple GSIs and a secondary index:
+```
+GameTitle: {
+  type: 'string',
+  primaryKey: 'hash'
+  index: ['secondary', GameTitleIndex-hash'. 'SomeOtherIndex-hash']
 }
 ```
 

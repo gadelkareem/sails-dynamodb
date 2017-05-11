@@ -187,15 +187,29 @@ module.exports = (function () {
 
               index = attributes.index;
 
-              indexParts = adapter._parseIndex(index, columnName);
-              indexName = indexParts[0];
-              indexType = indexParts[1];
+              if (_.isArray(index)){
+                index.forEach((oneIndex) => {
+                  indexParts = adapter._parseIndex(oneIndex, columnName);
+                  indexName = indexParts[0];
+                  indexType = indexParts[1];
 
-              if (typeof indices[indexName] === 'undefined') {
-                indices[indexName] = {};
+                  if (typeof indices[indexName] === 'undefined') {
+                    indices[indexName] = {};
+                  }
+
+                  indices[indexName][indexType] = columnName;
+                });
+              }else{
+                indexParts = adapter._parseIndex(index, columnName);
+                indexName = indexParts[0];
+                indexType = indexParts[1];
+
+                if (typeof indices[indexName] === 'undefined') {
+                  indices[indexName] = {};
+                }
+
+                indices[indexName][indexType] = columnName;
               }
-
-              indices[indexName][indexType] = columnName;
 
             }
 
@@ -549,6 +563,8 @@ module.exports = (function () {
             scanning  = false;
 
         if (indexing) {
+          // console.log("USING INDEX")
+          // console.log(indexing);
            query = model.query(options.where[hash])
           delete options.where[hash];
 
@@ -763,6 +779,9 @@ module.exports = (function () {
         fields = Object.keys(fields);
       }
 
+      // console.log("FIELDS")
+      // console.log(fields);
+
       for (var i = 0; i < fields.length; i++) {
 
         fieldName = fields[i];
@@ -783,8 +802,25 @@ module.exports = (function () {
 
         // using secondary or GSIs
         if (column.index){
+          // console.log("COLUMN.INDEX")
+          // console.log(column.index)
           if (_.isArray(column.index)){
-            throw new Error(`No support yet for multiple non-primary indexes, ${fieldName} = ${column.index}`);
+            column.index.forEach((oneIndex) => {
+              if (oneIndex === 'secondary'){
+                secondaryRange = fieldName;
+              }else{
+                indexInfo = adapter._parseIndex(oneIndex, fieldName);
+                indexName = indexInfo[0];
+                indexType = indexInfo[1];
+
+                if (typeof indices[indexName] === 'undefined') {
+                  indices[indexName] = {};
+                }
+
+                indices[indexName][indexType] = fieldName;
+              }
+            });
+            // throw new Error(`No support yet for multiple non-primary indexes, ${fieldName} = ${column.index}`);
           }else if (column.index === 'secondary'){
             secondaryRange = fieldName;
           }else{
@@ -801,6 +837,9 @@ module.exports = (function () {
         }
 
       }
+
+      // console.log("INDICES")
+      // console.log(indices)
 
       // set global secondary hash info
       var indicesHashed;
