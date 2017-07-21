@@ -36,7 +36,7 @@ var filters = {
   beginsWith: true,
   //?where={"name":{"in":["firstName lastName", "another name"]}}
   in: true,
-  //?where={"name":{"between":["firstName, "lastName""]}}
+  //?where={"name":{"between":["firstName", "lastName"]}}
   between: true
 };
 
