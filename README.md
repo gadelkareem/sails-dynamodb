@@ -69,6 +69,11 @@ Support for where is added as following:
   ?where={"name":{"in":["firstName lastName", "another name"]}}
   ?where={"name":{"between":["firstName", "lastName"]}}
 ```
+You can specify what attributes/keys should be returned from the query as following:
+```
+  //This will return only name and age in the result (if the field exists in the result)
+  ?where={"name":{"equals":"firstName lastName"}, "select": ["name","age"]}
+```
 
 ### Pagination
 __NOTE__: `skip` is not supported!
